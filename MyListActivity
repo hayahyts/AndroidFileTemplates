@@ -1,0 +1,59 @@
+#if (${PACKAGE_NAME} && ${PACKAGE_NAME} != "")package ${PACKAGE_NAME}#end
+
+import android.os.Bundle
+import android.view.View.GONE
+import android.view.View.VISIBLE
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.activity_${Model_Class_Lower}s.*
+
+#parse("File Header.java")
+class ${NAME} : AppCompatActivity() {
+    private lateinit var viewModel: ${Model_Class}sViewModel
+    private lateinit var adapter: ${Model_Class}sAdapter
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_${Model_Class_Lower}s)
+        setup()
+    }
+
+    private fun setup() {
+        viewModel = ViewModelProviders.of(this)
+            .get(${Model_Class}sViewModel::class.java)
+        viewModel.${Model_Class_Lower}s.observe(this, Observer { ${Model_Class_Lower}s ->
+            when {
+                ${Model_Class_Lower}s == null -> showError()
+                ${Model_Class_Lower}s.isEmpty() -> showNo${Model_Class}s()
+                else -> showContent(${Model_Class_Lower}s)
+            }
+        })
+    }
+
+    private fun showContent(${Model_Class_Lower}s: ArrayList<${Model_Class}>) {
+        adapter.swapData(${Model_Class_Lower}s)
+        recyclerView?.visibility = VISIBLE
+        msgTV?.visibility = GONE
+        loadingIndicator?.visibility = GONE
+    }
+
+    private fun showNo${Model_Class}s() {
+        msgTV?.text = "No ${Model_Class_Lower}s added"
+        msgTV?.visibility = VISIBLE
+        recyclerView?.visibility = GONE
+        loadingIndicator?.visibility = GONE
+    }
+
+    private fun showError() {
+        msgTV?.text = "Something went wrong.\nPlease check your internet!"
+        msgTV?.visibility = VISIBLE
+        recyclerView?.visibility = GONE
+        loadingIndicator?.visibility = GONE
+    }
+
+    private fun showSnack(s: String) {
+        Snackbar.make(root, s, Snackbar.LENGTH_SHORT).show()
+    }
+}

@@ -1,0 +1,69 @@
+
+
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.fragment_${Model_Class_Lower}s.*
+
+class ${NAME} : Fragment() {
+    private lateinit var viewModel: ${Model_Class}sViewModel
+    private lateinit var adapter: ${Model_Class}sAdapter
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.fragment_${Model_Class_Lower}s, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setup()
+    }
+
+    private fun setup() {
+        viewModel = ViewModelProviders.of(activity as FragmentActivity)
+            .get(${Model_Class}sViewModel::class.java)
+        viewModel.${Model_Class_Lower}s.observe(this, Observer { ${Model_Class_Lower}s ->
+            when {
+                ${Model_Class_Lower}s == null -> showError()
+                ${Model_Class_Lower}s.isEmpty() -> showNo${Model_Class}s()
+                else -> showContent(${Model_Class_Lower}s)
+            }
+        })
+    }
+
+    private fun showContent(${Model_Class_Lower}s: ArrayList<${Model_Class}>) {
+        adapter.swapData(${Model_Class_Lower}s)
+        recyclerView?.visibility = VISIBLE
+        msgTV?.visibility = GONE
+        loadingIndicator?.visibility = GONE
+    }
+
+    private fun showNo${Model_Class}s() {
+        msgTV?.text = "No ${Model_Class_Lower}s added"
+        msgTV?.visibility = VISIBLE
+        recyclerView?.visibility = GONE
+        loadingIndicator?.visibility = GONE
+    }
+
+    private fun showError() {
+        msgTV?.text = "Something went wrong.\nPlease check your internet!"
+        msgTV?.visibility = VISIBLE
+        recyclerView?.visibility = GONE
+        loadingIndicator?.visibility = GONE
+    }
+
+    private fun showSnack(s: String) {
+        Snackbar.make(root, s, Snackbar.LENGTH_SHORT).show()
+    }
+}

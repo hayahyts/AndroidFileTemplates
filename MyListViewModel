@@ -1,0 +1,47 @@
+#if (${PACKAGE_NAME} && ${PACKAGE_NAME} != "")package ${PACKAGE_NAME}#end
+
+
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
+
+#parse("File Header.java")
+class ${NAME}(application: Application) : AndroidViewModel(application) {
+    val ${Model_Class_Lower}s = MutableLiveData<ArrayList<${Model_Class}>>()
+
+    init {
+        loadData()
+    }
+
+    private fun loadData() {
+        FirebaseFirestore.getInstance()
+            .collection(${Collection_Path})
+            .addSnapshotListener { querySnapshot, ex ->
+                if (ex != null) {
+                    ${Model_Class_Lower}s.value = null
+                    return@addSnapshotListener
+                }
+
+                if (querySnapshot != null) {
+                    ${Model_Class_Lower}s.value = to${Model_Class}s(querySnapshot)
+                }
+            }
+    }
+
+    private fun to${Model_Class}s(querySnapshot: QuerySnapshot): ArrayList<${Model_Class}> {
+        val docs = querySnapshot.documents
+        val items = ArrayList<${Model_Class}>()
+
+        for (doc in docs) {
+            val item = doc.toObject(${Model_Class}::class.java)
+            if (item != null) {
+                item.id = doc.id
+                items.add(item)
+            }
+        }
+
+        return items
+    }
+}
